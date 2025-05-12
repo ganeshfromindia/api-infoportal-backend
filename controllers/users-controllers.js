@@ -1,0 +1,307 @@
+const { validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+const HttpError = require("../models/http-error");
+const User = require("../models/user");
+const Manufacturer = require("../models/manufacturer");
+const Trader = require("../models/trader");
+
+const getUsers = async (req, res, next) => {
+  let users;
+  try {
+    users = await User.find({}, "-password");
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching users failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+  res.json({ users: users.map((user) => user.toObject({ getters: true })) });
+};
+
+const getManufacturers = async (req, res, next) => {
+  let manufacturers;
+  let page = req.query.page;
+  let size = req.query.size;
+  try {
+    if (!page) page = 1;
+    if (!size) size = 10;
+    const limit = parseInt(size);
+    const skip = (parseInt(page) - 1) * size;
+    manufacturers = await Manufacturer.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ title: 1 });
+  } catch (err) {
+    console.log(err);
+    const error = new HttpError(
+      "Fetching manufacturers failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+  if (!manufacturers || manufacturers.length === 0) {
+    res.json({
+      products: [],
+      message: "Could not find products for the provided manufacturer id",
+    });
+    return;
+  }
+  return res.status(200).json({
+    manufacturers:
+      manufacturers &&
+      manufacturers.map((manufacturer, index) => ({
+        ...manufacturer.toObject({ getters: true }),
+        serialNo: (parseInt(page) - 1) * 10 + index + 1,
+      })),
+    size: size,
+    message: "success",
+    total: manufacturers.length,
+  });
+};
+const getTraders = async (req, res, next) => {
+  let traders;
+  let page = req.query.page;
+  let size = req.query.size;
+  try {
+    if (!page) page = 1;
+    if (!size) size = 10;
+    const limit = parseInt(size);
+    const skip = (parseInt(page) - 1) * size;
+    traders = await Trader.find().skip(skip).limit(limit).sort({ title: 1 });
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching traders failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+  if (!traders || traders.length === 0) {
+    res.json({
+      products: [],
+      message: "Could not find products for the provided manufacturer id",
+    });
+    return;
+  }
+  return res.status(200).json({
+    traders:
+      traders &&
+      traders.map((trader, index) => ({
+        ...trader.toObject({ getters: true }),
+        serialNo: (parseInt(page) - 1) * 10 + index + 1,
+      })),
+    size: size,
+    message: "success",
+    total: traders.length,
+  });
+};
+
+const signup = async (req, res, next) => {
+  // let role = req && req.body && req.body.role;
+  const errorMain = validationResult(req);
+  const errorData = validationResult(req).errors;
+  let result = [];
+  let emailError = errorData.filter((data) => data.param == "email")[0];
+  let usernameError = errorData.filter((data) => data.param == "name")[0];
+  let mobileNoError = errorData.filter((data) => data.param == "mobileNo")[0];
+  let passwordError = errorData.filter((data) => data.param == "password")[0];
+  if (emailError) {
+    result.push(emailError.msg);
+  }
+  if (usernameError) {
+    result.push(usernameError.msg);
+  }
+  if (mobileNoError) {
+    result.push(mobileNoError.msg);
+  }
+  if (passwordError) {
+    result.push(passwordError.msg);
+  }
+  if (result.length > 0) {
+    return res.status(422).json({ message: result });
+  }
+  if (!errorMain.isEmpty()) {
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
+  }
+
+  const { name, email, mobileNo, password, folder } = req.body;
+
+  let existingUser;
+
+  await User.findOne({ email: email })
+    .then((user) => {
+      existingUser = user;
+    })
+    .catch((err) => {
+      result.push(err);
+      return res.status(403).json({ message: result });
+    });
+  if (existingUser && existingUser.role !== "Trader") {
+    result.push("User exists already, please login instead.");
+  }
+
+  if (result.length > 0) {
+    return res.status(422).json({ message: result });
+  }
+
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    const error = new HttpError(
+      "Could not create user, please try again.",
+      500
+    );
+    return next(error);
+  }
+
+  // role = role == "Manufacturer" ? "Trader" : "Manufacturer";
+  let role = "Manufacturer";
+  const createdUser = new User({
+    name,
+    email,
+    mobileNo,
+    image: req.file.path,
+    password: hashedPassword,
+    role: role,
+    folder,
+    manufacturers: [],
+  });
+
+  let savedUser;
+
+  await createdUser
+    .save()
+    .then((user) => {
+      savedUser = user;
+    })
+    .catch((err) => {
+      result.push(err);
+      return res.status(403).json({ message: result });
+    });
+
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userId: savedUser.id,
+        email: savedUser.email,
+        mobileNo: savedUser.mobileNo,
+        role: savedUser.role,
+        userName: savedUser.name,
+        image: savedUser.image,
+      },
+      "[,ZCqF0B8Zwwm?Q_f5-D<X3]PHtpLUSi",
+      { expiresIn: "1d" }
+    );
+  } catch (err) {
+    const error = new HttpError(
+      "Signing up failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+
+  return res.status(201).json({
+    userId: savedUser.id,
+    email: savedUser.email,
+    mobileNo: savedUser.mobileNo,
+    token: token,
+    name: savedUser.name,
+    role: savedUser.role,
+    image: savedUser.image,
+  });
+};
+
+const login = async (req, res, next) => {
+  const { email, password } = req.body;
+  const errorMain = validationResult(req);
+  const errorData = validationResult(req).errors;
+  let result = [];
+  let emailError = errorData.filter((data) => data.param == "email")[0];
+  let passwordError = errorData.filter((data) => data.param == "password")[0];
+  if (emailError) {
+    result.push(emailError.msg);
+  }
+  if (passwordError) {
+    result.push(passwordError.msg);
+  }
+  if (result.length > 0) {
+    return res.status(422).json({ message: result });
+  }
+  if (!errorMain.isEmpty()) {
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
+  }
+  let existingUser;
+  await User.findOne({ email: email })
+    .then((user) => {
+      existingUser = user;
+    })
+    .catch((err) => {
+      result.push(err);
+      return res.status(403).json({ message: result });
+    });
+  if (!existingUser) {
+    result.push("Invalid credentials, could not log you in.");
+    return res.status(403).json({ message: result });
+  }
+
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (err) {
+    result.push("Invalid credentials, could not log you in.");
+    return res.status(403).json({ message: result });
+  }
+
+  if (!isValidPassword) {
+    result.push("Invalid credentials, could not log you in.");
+    return res.status(403).json({ message: result });
+  }
+
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userId: existingUser.id,
+        email: existingUser.email,
+        mobileNo: existingUser.mobileNo,
+        userName: existingUser.name,
+        role: existingUser.role,
+        image: existingUser.image,
+      },
+      "[,ZCqF0B8Zwwm?Q_f5-D<X3]PHtpLUSi",
+      { expiresIn: "1d" }
+    );
+  } catch (err) {
+    result.push("Logging in failed, please try again later.");
+    return res.status(403).json({ message: result });
+  }
+
+  // res.cookie("loggedIn", cookie.randomNumber, { hostOnly: true }).json({
+  res.json({
+    userId: existingUser.id,
+    email: existingUser.email,
+    mobileNo: existingUser.mobileNo,
+    token: token,
+    name: existingUser.name,
+    role: existingUser.role,
+    image: existingUser.image,
+  });
+};
+
+const downloadFile = async (req, res, next) => {
+  const { id, ref } = req.body;
+};
+
+exports.getUsers = getUsers;
+exports.getManufacturers = getManufacturers;
+exports.getTraders = getTraders;
+exports.signup = signup;
+exports.login = login;

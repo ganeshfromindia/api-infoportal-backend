@@ -23,6 +23,7 @@ const getUsers = async (req, res, next) => {
 
 const getManufacturers = async (req, res, next) => {
   let manufacturers;
+  let manufacturersAll;
   let page = req.query.page;
   let size = req.query.size;
   try {
@@ -30,6 +31,7 @@ const getManufacturers = async (req, res, next) => {
     if (!size) size = 10;
     const limit = parseInt(size);
     const skip = (parseInt(page) - 1) * size;
+    manufacturersAll = await Manufacturer.find()
     manufacturers = await Manufacturer.find()
       .skip(skip)
       .limit(limit)
@@ -58,11 +60,12 @@ const getManufacturers = async (req, res, next) => {
       })),
     size: size,
     message: "success",
-    total: manufacturers.length,
+    total: manufacturersAll.length,
   });
 };
 const getTraders = async (req, res, next) => {
   let traders;
+  let tradersAll;
   let page = req.query.page;
   let size = req.query.size;
   try {
@@ -70,6 +73,7 @@ const getTraders = async (req, res, next) => {
     if (!size) size = 10;
     const limit = parseInt(size);
     const skip = (parseInt(page) - 1) * size;
+	tradersAll = await Trader.find()
     traders = await Trader.find().skip(skip).limit(limit).sort({ title: 1 });
   } catch (err) {
     const error = new HttpError(
@@ -94,7 +98,7 @@ const getTraders = async (req, res, next) => {
       })),
     size: size,
     message: "success",
-    total: traders.length,
+    total: tradersAll.length,
   });
 };
 

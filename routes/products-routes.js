@@ -45,7 +45,7 @@ router.post(
     check("description")
       .isLength({ min: 6, max: 250 })
       .withMessage(
-        "Password must be at least 6 characters and max 250 characters"
+        "Description must be at least 6 characters and max 250 characters"
       ),
     check("title")
       .not()
@@ -92,7 +92,7 @@ router.patch(
     check("description")
       .isLength({ min: 6, max: 250 })
       .withMessage(
-        "Password must be at least 6 characters and max 250 characters"
+        "Description must be at least 6 characters and max 250 characters"
       ),
     check("title")
       .not()

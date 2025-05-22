@@ -7,6 +7,7 @@ const checkAuth = require("../middleware/check-auth");
 
 const router = express.Router();
 
+/*
 router.post(
   "/signup",
   fileUpload.single("image"),
@@ -36,7 +37,7 @@ router.post(
   ],
   usersController.signup
 );
-
+*/
 router.post(
   "/login",
   [

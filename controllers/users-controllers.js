@@ -6,6 +6,7 @@ const HttpError = require("../models/http-error");
 const User = require("../models/user");
 const Manufacturer = require("../models/manufacturer");
 const Trader = require("../models/trader");
+const traderDashboard = require("../models/traderDashboard");
 
 const getUsers = async (req, res, next) => {
   let users;
@@ -31,7 +32,7 @@ const getManufacturers = async (req, res, next) => {
     if (!size) size = 10;
     const limit = parseInt(size);
     const skip = (parseInt(page) - 1) * size;
-    manufacturersAll = await Manufacturer.find()
+    manufacturersAll = await Manufacturer.find();
     manufacturers = await Manufacturer.find()
       .skip(skip)
       .limit(limit)
@@ -73,7 +74,7 @@ const getTraders = async (req, res, next) => {
     if (!size) size = 10;
     const limit = parseInt(size);
     const skip = (parseInt(page) - 1) * size;
-	tradersAll = await Trader.find()
+    tradersAll = await Trader.find();
     traders = await Trader.find().skip(skip).limit(limit).sort({ title: 1 });
   } catch (err) {
     const error = new HttpError(
@@ -300,10 +301,79 @@ const login = async (req, res, next) => {
   });
 };
 
-const downloadFile = async (req, res, next) => {
-  const { id, ref } = req.body;
+const forgotPassword = async (req, res, next) => {
+  const { email, aadhaar } = req.body;
+  let trader;
+  let aadhharNo;
+  let hashedPassword;
+  let existingTrader;
+  try {
+    trader = await Trader.findOne({ email: email.trim() });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not find a Trader.",
+      500
+    );
+    return next(error);
+  }
+
+  try {
+    aadhharNo = await traderDashboard.findOne({ aadhaar: aadhaar.trim() });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not find a Trader.",
+      500
+    );
+    return next(error);
+  }
+
+  try {
+    existingTrader = await User.findOne({ email: email.trim() });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not find a Trader.",
+      500
+    );
+    return next(error);
+  }
+  if (trader) {
+    password = trader.title + "1234";
+    try {
+      hashedPassword = await bcrypt.hash(password, 12);
+    } catch (err) {
+      const error = new HttpError(
+        "Could not update password, please try again.",
+        500
+      );
+      return next(error);
+    }
+
+    try {
+      existingTrader
+        .updateOne({ $set: { password: hashedPassword } })
+        .then((obj) => {
+          console.log("Updated - ");
+        })
+        .catch((err) => {
+          const error = new HttpError(
+            "Could not update password, please try again.",
+            500
+          );
+        });
+      res.json({
+        password: password,
+      });
+    } catch (err) {
+      const error = new HttpError(
+        "Could not update password, please try again.",
+        500
+      );
+      return next(error);
+    }
+  }
 };
 
+exports.forgotPassword = forgotPassword;
 exports.getUsers = getUsers;
 exports.getManufacturers = getManufacturers;
 exports.getTraders = getTraders;

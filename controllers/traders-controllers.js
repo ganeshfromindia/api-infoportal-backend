@@ -414,7 +414,6 @@ const updateTrader = async (req, res, next) => {
   productsWithTrader = productsWithTrader.products.map((product) =>
     product._id.toString()
   );
-  console.log(products);
 
   if (products.length > 0) {
     newProductsArray = products.filter(
@@ -518,7 +517,7 @@ const createTraderDetails = async (req, res, next) => {
     );
   }
 
-  const { title, description, address } = req.body;
+  const { title, description, address, aadhaar } = req.body;
 
   try {
     admin = await User.findOne({ email: "admin@goodsinfoportal.com" });
@@ -556,11 +555,10 @@ const createTraderDetails = async (req, res, next) => {
     title,
     description,
     address,
+    aadhaar,
     userId: req.userData.userId,
     admin: admin._id,
   });
-
-  createdTraderDashboard.manufacturers.push(currentTrader.manufacturers);
 
   try {
     const sess = await mongoose.startSession();
@@ -581,6 +579,7 @@ const createTraderDetails = async (req, res, next) => {
 };
 
 const updateTraderDetails = async (req, res, next) => {
+  console.log("test");
   const errorMain = validationResult(req);
   const errorData = validationResult(req).errors;
   let result = [];
@@ -617,7 +616,7 @@ const updateTraderDetails = async (req, res, next) => {
     );
   }
 
-  const { title, description, address } = req.body;
+  const { title, description, address, aadhaar } = req.body;
   const traderId = req.params.pid;
 
   try {
@@ -640,6 +639,7 @@ const updateTraderDetails = async (req, res, next) => {
   traderDashboard.title = title;
   traderDashboard.description = description;
   traderDashboard.address = address;
+  traderDashboard.aadhaar = aadhaar;
 
   try {
     await traderDashboard.save();

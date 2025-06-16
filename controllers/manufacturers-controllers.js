@@ -101,7 +101,7 @@ const createManufacturer = async (req, res, next) => {
     );
   }
 
-  const { title, description, address } = req.body;
+  const { title, description, address, aadhaar } = req.body;
 
   let admin;
   try {
@@ -123,6 +123,7 @@ const createManufacturer = async (req, res, next) => {
     title,
     description,
     address,
+    aadhaar,
     userId: req.userData.userId,
     admin: admin._id,
     traders: [],
@@ -185,7 +186,7 @@ const updateManufacturer = async (req, res, next) => {
     );
   }
 
-  const { title, description, address } = req.body;
+  const { title, description, address, aadhaar } = req.body;
   const manufacturerId = req.params.pid;
 
   let manufacturer;
@@ -209,6 +210,7 @@ const updateManufacturer = async (req, res, next) => {
   manufacturer.title = title;
   manufacturer.description = description;
   manufacturer.address = address;
+  manufacturer.aadhaar = aadhaar;
 
   try {
     await manufacturer.save();

@@ -579,7 +579,6 @@ const createTraderDetails = async (req, res, next) => {
 };
 
 const updateTraderDetails = async (req, res, next) => {
-  console.log("test");
   const errorMain = validationResult(req);
   const errorData = validationResult(req).errors;
   let result = [];

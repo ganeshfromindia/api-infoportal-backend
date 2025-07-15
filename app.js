@@ -46,6 +46,7 @@ app.use("/api/users", usersRoutes);
 app.use("/api/traders", tradersRoutes);
 app.use("/api/products", productsRoutes);
 app.use("/api/download", downloadRoutes);
+
 /*
 app.use((req, res, next) => {
   res.sendFile(path.resolve(__dirname, "public", "index.html"));

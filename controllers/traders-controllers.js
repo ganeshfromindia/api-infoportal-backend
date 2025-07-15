@@ -470,6 +470,7 @@ const updateTrader = async (req, res, next) => {
     await tradersOfManufacturer.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "Something went wrong, could not update Trader.",
       500
@@ -657,11 +658,10 @@ const updateTraderDetails = async (req, res, next) => {
 
 const deleteTrader = async (req, res, next) => {
   const traderId = req.params.pid;
-  const traderEmail = req.userData.email;
+  // const manufacturerEmail = req.userData.email;
 
   let trader;
   let traderP;
-  let traderM;
   let traderDashboard;
   let traderUser;
   let isAuthorisedManufacturer;
@@ -669,11 +669,14 @@ const deleteTrader = async (req, res, next) => {
   try {
     trader = await Trader.findById(traderId).populate("manufacturers");
     manufacturer = await Manufacturer.findOne({ userId: req.userData.userId });
-    traderP = await Trader.findById(traderId).populate("products");
-    traderDashboard = await TraderDashboard.findOne({
-      userId: traderId,
+    traderP = await Trader.findById(traderId).populate({
+      path: "products",
+      match: { manufacturer: manufacturer._id },
     });
     traderUser = await User.findOne({ email: trader.email });
+    traderDashboard = await TraderDashboard.findOne({
+      userId: traderUser._id,
+    });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not delete Trader.",
@@ -706,6 +709,12 @@ const deleteTrader = async (req, res, next) => {
     await manufacturer.save({ session: sess });
     trader.manufacturers.pull({ _id: manufacturer._id });
     await trader.save({ session: sess });
+    for (const product of traderP.products) {
+      product.traders.pull(trader);
+      await product.save({ session: sess });
+      trader.products.pull({ _id: product._id });
+      await trader.save({ session: sess });
+    }
     if (trader.manufacturers.length === 0) {
       await trader.deleteOne({ session: sess });
       if (traderDashboard) {
@@ -713,10 +722,7 @@ const deleteTrader = async (req, res, next) => {
       }
       await traderUser.deleteOne({ session: sess });
     }
-    for (const product of traderP.products) {
-      product.traders.pull(trader);
-      await product.save({ session: sess });
-    }
+
     await sess.commitTransaction();
   } catch (err) {
     const error = new HttpError(

@@ -6,6 +6,8 @@ const HttpError = require("../models/http-error");
 const Manufacturer = require("../models/manufacturer");
 const User = require("../models/user");
 const rimraf = require("rimraf");
+const product = require("../models/product");
+const Trader = require("../models/trader");
 
 const getManufacturerById = async (req, res, next) => {
   const loggedInUserID = req.params.pid;
@@ -231,10 +233,16 @@ const deleteManufacturer = async (req, res, next) => {
   const manufacturerId = req.params.pid;
 
   let manufacturer;
+  let manufacturerUser;
+  let trader;
+
   try {
     manufacturer = await Manufacturer.findById(manufacturerId)
       .populate("admin")
+      .populate("traders")
+      .populate("products")
       .populate("userId");
+    manufacturerUser = await User.findOne({ email: manufacturer.userId.email });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not delete Manufacturer.",
@@ -264,11 +272,22 @@ const deleteManufacturer = async (req, res, next) => {
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
+    for (const product of manufacturer.products) {
+      for (const trader of manufacturer.traders) {
+        await trader.products.pull(product);
+        await trader.save({ session: sess });
+      }
+      await product.deleteOne({ session: sess });
+    }
+    for (const trader of manufacturer.traders) {
+      await trader.manufacturers.pull(manufacturer);
+      await trader.save({ session: sess });
+    }
     await manufacturer.deleteOne({ session: sess });
-    await manufacturer.admin.manufacturers.pull(manufacturer);
-    await manufacturer.admin.save({ session: sess });
+    await manufacturerUser.deleteOne({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "Something went wrong, could not delete Manufacturer.",
       500

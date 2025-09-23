@@ -128,6 +128,7 @@ const getTraderDashboardDataById = async (req, res, next) => {
 
 const getTradersByManufacturerId = async (req, res, next) => {
   const manufacturerId = req.params.uid;
+  const category = req.query.category;
   let manufacturerWithTraders;
   let totalProducts;
   let page = req.query.page;
@@ -139,12 +140,16 @@ const getTradersByManufacturerId = async (req, res, next) => {
     const limit = parseInt(size);
     const skip = (parseInt(page) - 1) * size;
     totalTraders = await Manufacturer.findOne({ userId: manufacturerId })
-      .populate("traders")
+      .populate({
+        path: "traders",
+        match: { category: category },
+      })
       .exec();
     manufacturerWithTraders = await Manufacturer.findOne({
       userId: manufacturerId,
     }).populate({
       path: "traders",
+      match: { category: category },
       options: {
         limit: limit,
         sort: { title: 1 },
@@ -184,7 +189,7 @@ const getTradersByManufacturerId = async (req, res, next) => {
 };
 
 const createTrader = async (req, res, next) => {
-  const { title, email, address, products } = req.body;
+  const { title, email, address, products, category } = req.body;
   const errorMain = validationResult(req);
   const errorData = validationResult(req).errors;
   let result = [];
@@ -283,6 +288,7 @@ const createTrader = async (req, res, next) => {
   });
 
   createdTrader.manufacturers.push(manufacturer._id);
+  createdTrader.category.push(category);
 
   const createdUser = new User({
     name: title.trim(),
@@ -407,7 +413,6 @@ const updateTrader = async (req, res, next) => {
   //     (err) => console.log(err)
   //   );
   // }
-
   trader.title = title;
   trader.email = email;
   trader.address = address;

@@ -7,6 +7,7 @@ const traderSchema = new Schema({
   email: { type: String, required: true },
   address: { type: String },
   listing: { type: String },
+  category: [{ type: String }],
   manufacturers: [
     {
       type: mongoose.Types.ObjectId,

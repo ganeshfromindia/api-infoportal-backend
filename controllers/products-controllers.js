@@ -39,6 +39,7 @@ const getProductsByManufacturerId = async (req, res, next) => {
   // console.log(storedCookie);
   // console.log(clientCookie);
   const manufacturerId = req.query.uid;
+  const categoryName = req.query.category;
   let manufacturerWithProducts;
   let totalProducts;
   let page = req.query.page;
@@ -51,13 +52,16 @@ const getProductsByManufacturerId = async (req, res, next) => {
     const skip = (parseInt(page) - 1) * size;
     totalProducts = await Manufacturer.findOne({
       userId: manufacturerId,
-    })
-      .populate("products")
-      .exec();
+    }).populate({
+      path: "products",
+      match: { category: categoryName },
+    });
+
     manufacturerWithProducts = await Manufacturer.findOne({
       userId: manufacturerId,
     }).populate({
       path: "products",
+      match: { category: categoryName },
       options: {
         limit: limit,
         sort: { title: 1 },
@@ -83,6 +87,10 @@ const getProductsByManufacturerId = async (req, res, next) => {
     });
     return;
   }
+  // manufacturerWithProducts.products = manufacturerWithProducts.products.filter(
+  //   (data) => data.category == categoryName
+  // );
+  // console.log(manufacturerWithProducts.products);
   return res.status(200).json({
     products:
       manufacturerWithProducts &&
@@ -98,6 +106,7 @@ const getProductsByManufacturerId = async (req, res, next) => {
 
 const getProductsByTraderId = async (req, res, next) => {
   const traderId = req.query.uid;
+  const category = req.query.category;
   let traderWithProducts;
   let tradersTotalProducts;
   let page = req.query.page;
@@ -112,12 +121,14 @@ const getProductsByTraderId = async (req, res, next) => {
     })
       .populate({
         path: "products",
+        match: { category: category },
       })
       .exec();
     traderWithProducts = await Trader.findOne({
       email: req.userData.email,
     }).populate({
       path: "products",
+      match: { category: category },
       options: {
         limit: limit,
         skip: skip,
@@ -157,6 +168,7 @@ const getProductsByTraderId = async (req, res, next) => {
 
 const getProductsByTraderAndManufacturerId = async (req, res, next) => {
   const traderId = req.query.uid;
+  const category = req.query.category;
   const manufacturerUserId = req.userData.userId;
   let traderWithProducts;
   let tradersTotalProducts;
@@ -183,12 +195,12 @@ const getProductsByTraderAndManufacturerId = async (req, res, next) => {
     tradersTotalProducts = await Trader.findById(traderId)
       .populate({
         path: "products",
-        match: { manufacturer: manufacturerId },
+        match: { manufacturer: manufacturerId, category: category },
       })
       .exec();
     traderWithProducts = await Trader.findById(traderId).populate({
       path: "products",
-      match: { manufacturer: manufacturerId },
+      match: { manufacturer: manufacturerId, category: category },
       options: {
         limit: limit,
         sort: { title: 1 },
@@ -235,6 +247,7 @@ const createProduct = async (req, res, next) => {
     pharmacopoeias,
     traders,
     dmf,
+    category,
   } = req.body;
   const errorMain = validationResult(req);
   const errorData = validationResult(req).errors;
@@ -309,6 +322,7 @@ const createProduct = async (req, res, next) => {
 
   const createdProduct = new Product({
     folder,
+    category,
     title: title.trim(),
     description,
     price,

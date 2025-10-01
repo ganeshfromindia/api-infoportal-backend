@@ -180,7 +180,7 @@ const getTradersByManufacturerId = async (req, res, next) => {
       manufacturerWithTraders &&
       manufacturerWithTraders.traders.map((trader, index) => ({
         ...trader.toObject({ getters: true }),
-        serialNo: (parseInt(page) - 1) * 10 + index + 1,
+        serialNo: (parseInt(page) - 1) * size + index + 1,
       })),
     size: size,
     message: "success",

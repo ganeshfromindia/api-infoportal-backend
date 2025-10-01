@@ -96,7 +96,7 @@ const getProductsByManufacturerId = async (req, res, next) => {
       manufacturerWithProducts &&
       manufacturerWithProducts.products.map((product, index) => ({
         ...product.toObject({ getters: true }),
-        serialNo: (parseInt(page) - 1) * 10 + index + 1,
+        serialNo: (parseInt(page) - 1) * size + index + 1,
       })),
     size: size,
     message: "success",
@@ -158,7 +158,7 @@ const getProductsByTraderId = async (req, res, next) => {
       traderWithProducts &&
       traderWithProducts.products.map((product, index) => ({
         ...product.toObject({ getters: true }),
-        serialNo: (parseInt(page) - 1) * 10 + index + 1,
+        serialNo: (parseInt(page) - 1) * size + index + 1,
       })),
     size: size,
     message: "success",
@@ -228,7 +228,7 @@ const getProductsByTraderAndManufacturerId = async (req, res, next) => {
       traderWithProducts &&
       traderWithProducts.products.map((product, index) => ({
         ...product.toObject({ getters: true }),
-        serialNo: (parseInt(page) - 1) * 10 + index + 1,
+        serialNo: (parseInt(page) - 1) * size + index + 1,
       })),
     size: size,
     message: "success",

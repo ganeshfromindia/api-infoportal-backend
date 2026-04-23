@@ -15,7 +15,7 @@ const getUsers = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Fetching users failed, please try again later.",
-      500
+      500,
     );
     return next(error);
   }
@@ -41,7 +41,7 @@ const getManufacturers = async (req, res, next) => {
     console.log(err);
     const error = new HttpError(
       "Fetching manufacturers failed, please try again later.",
-      500
+      500,
     );
     return next(error);
   }
@@ -79,7 +79,7 @@ const getTraders = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Fetching traders failed, please try again later.",
-      500
+      500,
     );
     return next(error);
   }
@@ -129,7 +129,7 @@ const signup = async (req, res, next) => {
   }
   if (!errorMain.isEmpty()) {
     return next(
-      new HttpError("Invalid inputs passed, please check your data.", 422)
+      new HttpError("Invalid inputs passed, please check your data.", 422),
     );
   }
 
@@ -159,7 +159,7 @@ const signup = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Could not create user, please try again.",
-      500
+      500,
     );
     return next(error);
   }
@@ -201,12 +201,12 @@ const signup = async (req, res, next) => {
         image: savedUser.image,
       },
       "[,ZCqF0B8Zwwm?Q_f5-D<X3]PHtpLUSi",
-      { expiresIn: "1d" }
+      { expiresIn: "180d" },
     );
   } catch (err) {
     const error = new HttpError(
       "Signing up failed, please try again later.",
-      500
+      500,
     );
     return next(error);
   }
@@ -223,6 +223,7 @@ const signup = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
+  console.log("test");
   const { email, password } = req.body;
   const errorMain = validationResult(req);
   const errorData = validationResult(req).errors;
@@ -240,7 +241,7 @@ const login = async (req, res, next) => {
   }
   if (!errorMain.isEmpty()) {
     return next(
-      new HttpError("Invalid inputs passed, please check your data.", 422)
+      new HttpError("Invalid inputs passed, please check your data.", 422),
     );
   }
   let existingUser;
@@ -282,7 +283,7 @@ const login = async (req, res, next) => {
         image: existingUser.image,
       },
       "[,ZCqF0B8Zwwm?Q_f5-D<X3]PHtpLUSi",
-      { expiresIn: "1d" }
+      { expiresIn: "180d" },
     );
   } catch (err) {
     result.push("Logging in failed, please try again later.");
@@ -312,7 +313,7 @@ const forgotPassword = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not find a Trader.",
-      500
+      500,
     );
     return next(error);
   }
@@ -322,7 +323,7 @@ const forgotPassword = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not find a Trader.",
-      500
+      500,
     );
     return next(error);
   }
@@ -332,7 +333,7 @@ const forgotPassword = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not find a Trader.",
-      500
+      500,
     );
     return next(error);
   }
@@ -343,7 +344,7 @@ const forgotPassword = async (req, res, next) => {
     } catch (err) {
       const error = new HttpError(
         "Could not update password, please try again.",
-        500
+        500,
       );
       return next(error);
     }
@@ -357,7 +358,7 @@ const forgotPassword = async (req, res, next) => {
         .catch((err) => {
           const error = new HttpError(
             "Could not update password, please try again.",
-            500
+            500,
           );
         });
       res.json({
@@ -366,7 +367,7 @@ const forgotPassword = async (req, res, next) => {
     } catch (err) {
       const error = new HttpError(
         "Could not update password, please try again.",
-        500
+        500,
       );
       return next(error);
     }

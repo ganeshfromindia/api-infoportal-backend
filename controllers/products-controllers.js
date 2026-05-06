@@ -684,8 +684,6 @@ const searchProductsByManufacturerId = async (req, res, next) => {
   let page = req.query.page;
   let size = req.query.size;
 
-  console.log(searchText, manufacturerId, categoryName);
-
   // if (!searchText) {
   //   const error = new HttpError("Search text is required.", 400);
   //   return next(error);

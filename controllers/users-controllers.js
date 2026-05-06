@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -223,7 +224,6 @@ const signup = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-  console.log("test");
   const { email, password } = req.body;
   const errorMain = validationResult(req);
   const errorData = validationResult(req).errors;

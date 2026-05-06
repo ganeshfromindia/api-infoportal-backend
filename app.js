@@ -34,7 +34,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization",
   );
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
 
@@ -94,8 +94,8 @@ const port = process.env.PORT || 5000;
 
 mongoose
   .connect(
-    // `mongodb+srv://hello:1Uv89RYdf75fal3w@ewcluster0.kxltmm6.mongodb.net/apitraders?authSource=admin&replicaSet=rs0&retryWrites=true&w=majority&appName=EWCluster0`
-    `mongodb+srv://hello:1Uv89RYdf75fal3w@ewcluster0.kxltmm6.mongodb.net/apitraders?retryWrites=true&w=majority`
+    // `mongodb+srv://hello:1Uv89RYdf75fal3w@ewcluster0.kxltmm6.mongodb.net/apitraders?authSource=admin&replicaSet=rs0&retryWrites=true&w=majority&appName=EWCluster0`,
+    `mongodb+srv://hello:1Uv89RYdf75fal3w@ewcluster0.kxltmm6.mongodb.net/apitraders?retryWrites=true&w=majority`,
   )
   .then(() => {
     app.listen(port);

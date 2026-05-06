@@ -141,12 +141,22 @@ server {
 https://app.outlier.ai/en/expert/instruction/6865709bf884d016b4c10164
 
 
-rror
+error
 Invalid value { company_id: 1, employee_code: 'asdas32', employee_name: 'asAS', email_id: 'asa@DSAA.COM', password: 'sfdsfdsfs', role: 2, birthDate: null, joiningDate: null, leftDate: null, perHourRate: 0, contact_number: null, employeeAddress: null, Department: null, subDepartment: null, section: 2, bankName: null, bankBranch: null, bankIFSC: null, bankAccountNumber: null, is_active: 1 }
 
 
+added code for im24x7 biometric 
 
+Alert.alert("Biometrics NA", "Biometrics NA", [
+                 {
+                   text: "Cancel",
+                   onPress: () => console.log("Cancel Pressed"),
+                   style: "cancel", // iOS only: makes the text bold
+                 },
+               ]);
+        }
 
+Android SDK - Required for building and installing your app on Android
 
 
 

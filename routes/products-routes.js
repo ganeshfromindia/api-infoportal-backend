@@ -10,11 +10,14 @@ router.use(checkAuth);
 
 router.get("/:pid", productController.getProductById);
 
-router.get("/manufacturer/id", productController.getProductsByManufacturerId);
-router.get("/trader/id", productController.getProductsByTraderId);
+router.get(
+  "/manufacturer/id",
+  productController.searchProductsByManufacturerId,
+);
+router.get("/trader/id", productController.searchProductsByTraderId);
 router.get(
   "/trader/manufacturer/id",
-  productController.getProductsByTraderAndManufacturerId
+  productController.getProductsByTraderAndManufacturerId,
 );
 
 router.post(
@@ -45,7 +48,7 @@ router.post(
     check("description")
       .isLength({ min: 6, max: 250 })
       .withMessage(
-        "Description must be at least 6 characters and max 250 characters"
+        "Description must be at least 6 characters and max 250 characters",
       ),
     check("title")
       .not()
@@ -53,7 +56,7 @@ router.post(
       .withMessage("Title is required")
       .isLength({ min: 6, max: 100 })
       .withMessage(
-        "Title must be at least 6 characters and max 100 characters"
+        "Title must be at least 6 characters and max 100 characters",
       ),
     check("price")
       .isNumeric()
@@ -61,7 +64,7 @@ router.post(
       .isLength({ max: 100 })
       .withMessage("Maximum numerical price digits should be 100"),
   ],
-  productController.createProduct
+  productController.createProduct,
 );
 
 router.patch(
@@ -92,7 +95,7 @@ router.patch(
     check("description")
       .isLength({ min: 6, max: 250 })
       .withMessage(
-        "Description must be at least 6 characters and max 250 characters"
+        "Description must be at least 6 characters and max 250 characters",
       ),
     check("title")
       .not()
@@ -100,7 +103,7 @@ router.patch(
       .withMessage("Title is required")
       .isLength({ min: 6, max: 100 })
       .withMessage(
-        "Title must be at least 6 characters and max 100 characters"
+        "Title must be at least 6 characters and max 100 characters",
       ),
     check("price")
       .isNumeric()
@@ -108,7 +111,7 @@ router.patch(
       .isLength({ max: 100 })
       .withMessage("Maximum numerical price digits should be 100"),
   ],
-  productController.updateProduct
+  productController.updateProduct,
 );
 
 router.delete("/:pid", productController.deleteProduct);

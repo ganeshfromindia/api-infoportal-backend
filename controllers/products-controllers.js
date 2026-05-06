@@ -17,7 +17,7 @@ const getProductById = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not find a Product.",
-      500
+      500,
     );
     return next(error);
   }
@@ -25,7 +25,7 @@ const getProductById = async (req, res, next) => {
   if (!product) {
     const error = new HttpError(
       "Could not find Product for the provided id.",
-      404
+      404,
     );
     return next(error);
   }
@@ -72,7 +72,7 @@ const getProductsByManufacturerId = async (req, res, next) => {
     console.log(err);
     const error = new HttpError(
       "Fetching Products failed, please try again later.",
-      500
+      500,
     );
     return next(error);
   }
@@ -140,7 +140,7 @@ const getProductsByTraderId = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Fetching Products failed, please try again later.",
-      500
+      500,
     );
     return next(error);
   }
@@ -182,7 +182,7 @@ const getProductsByTraderAndManufacturerId = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Fetching Product failed, please try again.",
-      500
+      500,
     );
     return next(error);
   }
@@ -210,7 +210,7 @@ const getProductsByTraderAndManufacturerId = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Fetching Products failed, please try again later.",
-      500
+      500,
     );
     return next(error);
   }
@@ -254,7 +254,7 @@ const createProduct = async (req, res, next) => {
   let result = [];
   let titleError = errorData.filter((data) => data.param == "title")[0];
   let descriptionError = errorData.filter(
-    (data) => data.param == "description"
+    (data) => data.param == "description",
   )[0];
   let priceError = errorData.filter((data) => data.param == "price")[0];
   if (titleError) {
@@ -271,7 +271,7 @@ const createProduct = async (req, res, next) => {
   }
   if (!errorMain.isEmpty()) {
     return next(
-      new HttpError("Invalid inputs passed, please check your data.", 422)
+      new HttpError("Invalid inputs passed, please check your data.", 422),
     );
   }
 
@@ -289,7 +289,7 @@ const createProduct = async (req, res, next) => {
     console.log(err);
     const error = new HttpError(
       "Creating Product failed, please try again first.",
-      500
+      500,
     );
     return next(error);
   }
@@ -307,7 +307,7 @@ const createProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Could not find manufacturer for provided id.",
-      500
+      500,
     );
     return next(error);
   }
@@ -315,7 +315,7 @@ const createProduct = async (req, res, next) => {
   if (!manufacturer) {
     const error = new HttpError(
       "Could not find manufacturer for provided id.",
-      404
+      404,
     );
     return next(error);
   }
@@ -375,7 +375,7 @@ const createProduct = async (req, res, next) => {
     console.log(err);
     const error = new HttpError(
       "Creating Product failed, please try again second.",
-      500
+      500,
     );
     return next(error);
   }
@@ -407,7 +407,7 @@ const updateProduct = async (req, res, next) => {
   let result = [];
   let titleError = errorData.filter((data) => data.param == "title")[0];
   let descriptionError = errorData.filter(
-    (data) => data.param == "description"
+    (data) => data.param == "description",
   )[0];
   let priceError = errorData.filter((data) => data.param == "price")[0];
   if (titleError) {
@@ -424,7 +424,7 @@ const updateProduct = async (req, res, next) => {
   }
   if (!errorMain.isEmpty()) {
     return next(
-      new HttpError("Invalid inputs passed, please check your data.", 422)
+      new HttpError("Invalid inputs passed, please check your data.", 422),
     );
   }
 
@@ -437,7 +437,7 @@ const updateProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not update Product.",
-      500
+      500,
     );
     return next(error);
   }
@@ -450,7 +450,7 @@ const updateProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Updating Product failed, please try again.",
-      500
+      500,
     );
     return next(error);
   }
@@ -458,14 +458,14 @@ const updateProduct = async (req, res, next) => {
   if (!productManufacturer) {
     const error = new HttpError(
       "Could not find manufacturer for provided product.",
-      404
+      404,
     );
     return next(error);
   }
   if (product.manufacturer.toString() !== productManufacturer._id.toString()) {
     const error = new HttpError(
       "You are not allowed to edit this Product.",
-      401
+      401,
     );
     return next(error);
   }
@@ -529,7 +529,7 @@ const updateProduct = async (req, res, next) => {
       try {
         await fse.copySync(
           `uploads/documents/${product.folder}`,
-          `uploads/documents/${folder}`
+          `uploads/documents/${folder}`,
         );
         rimraf(`uploads/documents/${product.folder}`, (err) => {
           console.log(err);
@@ -585,7 +585,7 @@ const updateProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not update Product.",
-      500
+      500,
     );
     return next(error);
   }
@@ -607,7 +607,7 @@ const deleteProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not delete Product.",
-      500
+      500,
     );
     return next(error);
   }
@@ -620,7 +620,7 @@ const deleteProduct = async (req, res, next) => {
   if (!product.manufacturer.userId.equals(req.userData.userId)) {
     const error = new HttpError(
       "You are not allowed to delete this Product.",
-      401
+      401,
     );
     return next(error);
   }
@@ -654,7 +654,7 @@ const deleteProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not delete Product.",
-      500
+      500,
     );
     return next(error);
   }
@@ -668,10 +668,175 @@ const deleteProduct = async (req, res, next) => {
 
   rimraf(
     `uploads/documents/Manufacturers/${product.manufacturer.userId.name}/Products/${product.title}`,
-    (err) => console.log(err)
+    (err) => console.log(err),
   );
   // }
   res.status(200).json({ message: "Deleted Product." });
+};
+
+const searchProductsByManufacturerId = async (req, res, next) => {
+  const manufacturerId = req.query.uid;
+  const searchText = req.query.search;
+  const categoryName = req.query.category;
+
+  let manufacturerWithProducts;
+  let totalProducts;
+  let page = req.query.page;
+  let size = req.query.size;
+
+  console.log(searchText, manufacturerId, categoryName);
+
+  // if (!searchText) {
+  //   const error = new HttpError("Search text is required.", 400);
+  //   return next(error);
+  // }
+
+  try {
+    if (!page) page = 1;
+    if (!size) size = 10;
+    const limit = parseInt(size);
+    const skip = (parseInt(page) - 1) * size;
+
+    const searchRegex = new RegExp(searchText, "i");
+
+    const matchQuery = {
+      $or: [{ title: searchRegex }, { description: searchRegex }],
+    };
+
+    if (categoryName) {
+      matchQuery.category = categoryName;
+    }
+
+    totalProducts = await Manufacturer.findOne({
+      userId: manufacturerId,
+    }).populate({
+      path: "products",
+      match: matchQuery,
+    });
+
+    manufacturerWithProducts = await Manufacturer.findOne({
+      userId: manufacturerId,
+    }).populate({
+      path: "products",
+      match: matchQuery,
+      options: {
+        limit: limit,
+        sort: { title: 1 },
+        skip: skip,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    const error = new HttpError(
+      "Searching Products failed, please try again later.",
+      500,
+    );
+    return next(error);
+  }
+
+  if (
+    !manufacturerWithProducts ||
+    manufacturerWithProducts.products.length === 0
+  ) {
+    res.json({
+      products: [],
+      message: "Could not find products matching the search criteria.",
+    });
+    return;
+  }
+
+  return res.status(200).json({
+    products:
+      manufacturerWithProducts &&
+      manufacturerWithProducts.products.map((product, index) => ({
+        ...product.toObject({ getters: true }),
+        serialNo: (parseInt(page) - 1) * size + index + 1,
+      })),
+    size: size,
+    message: "success",
+    total: totalProducts.products.length,
+  });
+};
+
+const searchProductsByTraderId = async (req, res, next) => {
+  const searchText = req.query.search;
+  const category = req.query.category;
+  let traderWithProducts;
+  let tradersTotalProducts;
+  let page = req.query.page;
+  let size = req.query.size;
+
+  //if (!searchText) {
+  //  const error = new HttpError("Search text is required.", 400);
+  //  return next(error);
+  //}
+
+  try {
+    if (!page) page = 1;
+    if (!size) size = 10;
+    const limit = parseInt(size);
+    const skip = (parseInt(page) - 1) * size;
+
+    const searchRegex = new RegExp(searchText, "i");
+
+    const matchQuery = {
+      $or: [{ title: searchRegex }, { description: searchRegex }],
+    };
+
+    if (category) {
+      matchQuery.category = category;
+    }
+
+    tradersTotalProducts = await Trader.findOne({
+      email: req.userData.email,
+    })
+      .populate({
+        path: "products",
+        match: matchQuery,
+      })
+      .exec();
+
+    traderWithProducts = await Trader.findOne({
+      email: req.userData.email,
+    }).populate({
+      path: "products",
+      match: matchQuery,
+      options: {
+        limit: limit,
+        skip: skip,
+      },
+      populate: {
+        path: "manufacturer",
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    const error = new HttpError(
+      "Searching Products failed, please try again later.",
+      500,
+    );
+    return next(error);
+  }
+
+  if (!traderWithProducts || traderWithProducts.products.length === 0) {
+    res.json({
+      products: [],
+      message: "Could not find products matching the search criteria.",
+    });
+    return;
+  }
+
+  return res.status(200).json({
+    products:
+      traderWithProducts &&
+      traderWithProducts.products.map((product, index) => ({
+        ...product.toObject({ getters: true }),
+        serialNo: (parseInt(page) - 1) * size + index + 1,
+      })),
+    size: size,
+    message: "success",
+    total: tradersTotalProducts.products.length,
+  });
 };
 
 exports.getProductById = getProductById;
@@ -682,3 +847,5 @@ exports.getProductsByTraderAndManufacturerId =
 exports.createProduct = createProduct;
 exports.updateProduct = updateProduct;
 exports.deleteProduct = deleteProduct;
+exports.searchProductsByManufacturerId = searchProductsByManufacturerId;
+exports.searchProductsByTraderId = searchProductsByTraderId;
